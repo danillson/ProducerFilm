@@ -10,13 +10,13 @@ public class ProducerInterval
     public ProducerInterval(string producer, int interval, int previousWin, int followingWin)
     {
         if (string.IsNullOrWhiteSpace(producer))
-            throw new ArgumentException("Producer cannot be empty", nameof(producer));
+            throw new ArgumentException("Nao pode ser vazio", nameof(producer));
 
         if (interval < 0)
-            throw new ArgumentException("Interval cannot be negative", nameof(interval));
+            throw new ArgumentException("Nao pode ser negativo", nameof(interval));
 
         if (previousWin >= followingWin)
-            throw new ArgumentException("PreviousWin must be before FollowingWin");
+            throw new ArgumentException("Verificar período");
 
         Producer = producer;
         Interval = interval;

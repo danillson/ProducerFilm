@@ -10,20 +10,18 @@ public class MovieListHistory
     public string? Winner { get; private set; }
     public DateTime CreatedAt { get; private set; }
 
-    // Construtor privado para EF Core
     private MovieListHistory() 
     {
         Title = string.Empty;
     }
 
-    // Construtor para criação da entidade
     public MovieListHistory(int year, string title, string? studios, string? producers, string? winner)
     {
         if (string.IsNullOrWhiteSpace(title))
-            throw new ArgumentException("Title cannot be empty", nameof(title));
+            throw new ArgumentException("Nao pode ser vazio", nameof(title));
 
         if (year < 1900 || year > DateTime.UtcNow.Year + 10)
-            throw new ArgumentException("Invalid year", nameof(year));
+            throw new ArgumentException("Ano invalido", nameof(year));
 
         Year = year;
         Title = title;
@@ -33,10 +31,8 @@ public class MovieListHistory
         CreatedAt = DateTime.UtcNow;
     }
 
-    // Método de domínio para verificar se é vencedor
     public bool IsWinner() => !string.IsNullOrWhiteSpace(Winner) && Winner.Equals("yes", StringComparison.OrdinalIgnoreCase);
 
-    // Método de domínio para obter lista de produtores
     public IEnumerable<string> GetProducersList()
     {
         if (string.IsNullOrWhiteSpace(Producers))
@@ -49,11 +45,10 @@ public class MovieListHistory
             .Distinct();
     }
 
-    // Método para atualizar informações
     public void Update(string title, string? studios, string? producers, string? winner)
     {
         if (string.IsNullOrWhiteSpace(title))
-            throw new ArgumentException("Title cannot be empty", nameof(title));
+            throw new ArgumentException("Title nao pode ser vazio", nameof(title));
 
         Title = title;
         Studios = studios;

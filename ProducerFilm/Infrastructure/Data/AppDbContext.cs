@@ -15,12 +15,10 @@ public class AppDbContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
 
-        // Configurações da entidade MovieListHistory
         modelBuilder.Entity<MovieListHistory>(entity =>
         {
             entity.HasKey(e => e.Id);
             
-            // Configurar propriedades privadas
             entity.Property(e => e.Id)
                 .HasColumnName("Id");
             
@@ -49,7 +47,6 @@ public class AppDbContext : DbContext
                 .HasColumnName("CreatedAt")
                 .IsRequired();
             
-            // Índice para melhorar consultas por ano
             entity.HasIndex(e => e.Year)
                 .HasDatabaseName("IX_MovieListHistories_Year");
         });

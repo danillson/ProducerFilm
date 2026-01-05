@@ -24,52 +24,21 @@ public class MovieListHistoryService : IMovieListHistoryService
 
     public async Task<IEnumerable<MovieListHistoryDto>> GetAllMoviesAsync()
     {
-        _logger.LogInformation("Getting all movies from service");
+        _logger.LogInformation("Obter todos");
         var movies = await _repository.GetAllAsync();
-        return movies.Select(MapToDto);
-    }
-
-    public async Task<MovieListHistoryDto?> GetMovieByIdAsync(int id)
-    {
-        _logger.LogInformation("Getting movie with ID: {Id}", id);
-        var movie = await _repository.GetByIdAsync(id);
-        return movie != null ? MapToDto(movie) : null;
-    }
-
-    public async Task<IEnumerable<MovieListHistoryDto>> GetMoviesByYearAsync(int year)
-    {
-        _logger.LogInformation("Getting movies from year: {Year}", year);
-        var movies = await _repository.GetByYearAsync(year);
         return movies.Select(MapToDto);
     }
 
     public async Task<IEnumerable<MovieListHistoryDto>> GetWinnersAsync()
     {
-        _logger.LogInformation("Getting winner movies");
+        _logger.LogInformation("Obter vencedores");
         var winners = await _repository.GetWinnersAsync();
         return winners.Select(MapToDto);
     }
 
-    public async Task<MovieStatisticsDto> GetStatisticsAsync()
-    {
-        _logger.LogInformation("Calculating movie statistics");
-        var allMovies = await _repository.GetAllAsync();
-        var winners = await _repository.GetWinnersAsync();
-        var years = allMovies.Select(m => m.Year).Distinct().OrderBy(y => y).ToList();
-
-        return new MovieStatisticsDto
-        {
-            TotalMovies = allMovies.Count(),
-            TotalWinners = winners.Count(),
-            YearsCount = years.Count,
-            MinYear = years.Any() ? years.Min() : 0,
-            MaxYear = years.Any() ? years.Max() : 0
-        };
-    }
-
     public async Task<WinnerIntervalResponseDto> GetWinnerIntervalsAsync()
     {
-        _logger.LogInformation("Calculating winner intervals");
+        _logger.LogInformation("Calculando a lista de indicados");
         var winners = await _repository.GetWinnersAsync();
         var result = _winnerIntervalService.CalculateWinnerIntervals(winners);
 
@@ -90,41 +59,6 @@ public class MovieListHistoryService : IMovieListHistoryService
                 FollowingWin = i.FollowingWin
             }).ToList()
         };
-    }
-
-    public async Task<MovieListHistoryDto> CreateMovieAsync(CreateMovieListHistoryDto dto)
-    {
-        _logger.LogInformation("Creating new movie: {Title}", dto.Title);
-        
-        var movie = new MovieListHistory(dto.Year, dto.Title, dto.Studios, dto.Producers, dto.Winner);
-        var created = await _repository.AddAsync(movie);
-        await _repository.SaveChangesAsync();
-
-        return MapToDto(created);
-    }
-
-    public async Task UpdateMovieAsync(int id, UpdateMovieListHistoryDto dto)
-    {
-        _logger.LogInformation("Updating movie with ID: {Id}", id);
-        
-        var movie = await _repository.GetByIdAsync(id);
-        if (movie == null)
-            throw new KeyNotFoundException($"Movie with ID {id} not found");
-
-        movie.Update(dto.Title, dto.Studios, dto.Producers, dto.Winner);
-        await _repository.UpdateAsync(movie);
-        await _repository.SaveChangesAsync();
-    }
-
-    public async Task DeleteMovieAsync(int id)
-    {
-        _logger.LogInformation("Deleting movie with ID: {Id}", id);
-        
-        if (!await _repository.ExistsAsync(id))
-            throw new KeyNotFoundException($"Movie with ID {id} not found");
-
-        await _repository.DeleteAsync(id);
-        await _repository.SaveChangesAsync();
     }
 
     private static MovieListHistoryDto MapToDto(MovieListHistory entity)
