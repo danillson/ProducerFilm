@@ -105,17 +105,18 @@ dotnet test ProducerFilm.IntegrationTests --filter "GetWinnerInterval_ShouldCalc
 dotnet test ProducerFilm.IntegrationTests --collect:"XPlat Code Coverage"
 ```
 
+### Arquivos com dados para teste
+
+- Ao rodar a aplicação a primeira vez, os aquivos da pasta `fileToRead` (Movielist01.csv e Movielist02.csv) serão processados automaticamente e inseridos no banco de dados em memória;
+- Após o processamento, os arquivos serão movidos para a pasta `fileProcessed';
+- Caso seja necessário, é possível limpar a tabela MovieListHistory do banco de dados e reiniciar o processo;
+
 ### Cenários de Teste Cobertos
 
 - Banco de dados vazio
 - Apenas um vencedor
 - Cálculo correto de intervalos mínimo e máximo
-- Múltiplos produtores com mesmo intervalo
-- Produtor com 3+ vitórias
-- Ignorar não-vencedores
-- Múltiplos produtores no mesmo filme
 - Formato correto da resposta JSON
-- Cenário real do Golden Raspberry Awards
 
 ---
 
