@@ -1,190 +1,159 @@
-# ProducerFilm - Sistema de ImportaÁ„o de Filmes
+# ProducerFilm API
 
-## ?? DescriÁ„o
-
-Sistema de importaÁ„o autom·tica de dados de filmes a partir de arquivos CSV para banco de dados SQLite.
-
-## ?? Funcionalidades Implementadas
-
-### ? ImportaÁ„o de CSV
-- Leitura autom·tica de arquivos CSV da pasta `fileToRead`
-- Processamento ao iniciar a aplicaÁ„o
-- Ignorar primeira linha (cabeÁalho)
-- GravaÁ„o dos dados na tabela `MovieListHistory`
-- MovimentaÁ„o dos arquivos processados para `fileProcessed`
-
-### ? Estrutura do CSV
-```csv
-year;title;studios;producers;winner
-1980;Can't Stop the Music;Associated Film Distribution;Allan Carr;yes
-1980;Cruising;Lorimar Productions, United Artists;Jerry Weintraub;
-```
-
-**Campos:**
-- `year` (int) - Ano do filme
-- `title` (string) - TÌtulo do filme
-- `studios` (string) - Est˙dios
-- `producers` (string) - Produtores
-- `winner` (string) - "yes" para vencedores, vazio caso contr·rio
-
-### ? API REST - Endpoints DisponÌveis
-
-#### MovieListHistory
-- `GET /api/movielisthistory` - Lista todos os filmes
-- `GET /api/movielisthistory/{id}` - ObtÈm filme por ID
-- `GET /api/movielisthistory/year/{year}` - Filmes por ano
-- `GET /api/movielisthistory/winners` - Apenas vencedores
-- `GET /api/movielisthistory/statistics` - EstatÌsticas
-- `POST /api/movielisthistory` - Criar novo filme
-- `PUT /api/movielisthistory/{id}` - Atualizar filme
-- `DELETE /api/movielisthistory/{id}` - Deletar filme
-
-#### Outros
-- `GET /api/films` - Lista de filmes (exemplo)
-- `GET /api/hello` - Endpoint de teste
-- `GET /todos` - Lista de TODOs (exemplo)
-
-## ??? Como Usar
-
-### 1. Preparar arquivo CSV
-Coloque seu arquivo CSV na pasta `ProducerFilm/fileToRead/` com o formato:
-```csv
-year;title;studios;producers;winner
-1980;Can't Stop the Music;Associated Film Distribution;Allan Carr;yes
-```
-
-### 2. Executar a aplicaÁ„o
-```bash
-dotnet run --project ProducerFilm/ProducerFilm.csproj
-```
-
-### 3. O que acontece
-? Banco de dados È criado/migrado automaticamente
-? Arquivos CSV s„o lidos da pasta `fileToRead`
-? Dados s„o importados para a tabela `MovieListHistory`
-? Arquivos s„o movidos para `fileProcessed`
-? Swagger UI abre automaticamente
-
-### 4. Acessar Swagger
-- URL: `http://localhost:5231/`
-- DocumentaÁ„o interativa de todos os endpoints
-
-## ?? Exemplo de Logs
-
-```
-info: ProducerFilm.Services.FileProcessorService[0]
-      Verificando arquivos CSV na pasta fileToRead...
-info: ProducerFilm.Services.FileProcessorService[0]
-      1 arquivo(s) CSV encontrado(s).
-info: ProducerFilm.Services.FileProcessorService[0]
-      Processando arquivo: movies.csv
-info: ProducerFilm.Services.FileProcessorService[0]
-      Dados importados com sucesso do arquivo: movies.csv
-info: ProducerFilm.Services.FileProcessorService[0]
-      10 registro(s) importado(s) do arquivo movies.csv
-info: ProducerFilm.Services.FileProcessorService[0]
-      Arquivo movido: movies.csv -> fileProcessed/
-info: ProducerFilm.Services.FileProcessorService[0]
-      Processamento de arquivos CSV concluÌdo.
-```
-
-## ??? Estrutura do Banco de Dados
-
-### Tabela: MovieListHistories
-| Coluna | Tipo | DescriÁ„o |
-|--------|------|-----------|
-| Id | INTEGER | Chave prim·ria (auto-increment) |
-| Year | INTEGER | Ano do filme |
-| Title | TEXT(300) | TÌtulo do filme |
-| Studios | TEXT(200) | Est˙dios produtores |
-| Producers | TEXT(300) | Produtores |
-| Winner | TEXT(10) | "yes" ou vazio |
-| CreatedAt | TEXT | Data de criaÁ„o do registro |
-
-**Õndices:**
-- `IX_MovieListHistories_Year` - Õndice no campo Year para consultas otimizadas
-
-## ?? Pacotes NuGet Utilizados
-
-- `Microsoft.EntityFrameworkCore.Sqlite` (8.0.11)
-- `Microsoft.EntityFrameworkCore.Design` (8.0.11)
-- `Swashbuckle.AspNetCore` (10.1.0)
-- `CsvHelper` (33.1.0)
-
-## ?? Estrutura de Pastas
-
-```
-ProducerFilm/
-??? Controllers/
-?   ??? HelloController.cs
-?   ??? FilmsController.cs
-?   ??? MovieListHistoryController.cs
-??? Data/
-?   ??? AppDbContext.cs
-??? Models/
-?   ??? Film.cs
-?   ??? MovieListHistory.cs
-??? Services/
-?   ??? FileProcessorService.cs
-??? Migrations/
-??? fileToRead/          # Coloque arquivos CSV aqui
-??? fileProcessed/       # Arquivos processados v„o aqui
-??? producerfilm.db      # Banco de dados SQLite
-```
-
-## ?? ConfiguraÁ„o
-
-### appsettings.json
-```json
-{
-  "ConnectionStrings": {
-    "DefaultConnection": "Data Source=producerfilm.db"
-  }
-}
-```
-
-### Separador CSV
-O sistema est· configurado para usar **ponto e vÌrgula (;)** como separador.
-Para alterar, edite `FileProcessorService.cs`:
-```csharp
-Delimiter = ";",  // Altere aqui
-```
-
-## ?? ObservaÁıes Importantes
-
-1. **Primeira linha do CSV È ignorada** (deve conter os nomes das colunas)
-2. **Arquivos j· processados** recebem timestamp se houver duplicaÁ„o
-3. **Campo winner** È opcional (pode estar vazio)
-4. **MigraÁ„o autom·tica** ao iniciar a aplicaÁ„o
-5. **Logs detalhados** de todas as operaÁıes
-
-## ?? Testando
-
-### Via Swagger UI
-1. Execute a aplicaÁ„o
-2. Acesse `http://localhost:5231/`
-3. Teste os endpoints interativamente
-
-### Via curl
-```bash
-# Listar todos os filmes
-curl http://localhost:5231/api/movielisthistory
-
-# Filmes vencedores
-curl http://localhost:5231/api/movielisthistory/winners
-
-# EstatÌsticas
-curl http://localhost:5231/api/movielisthistory/statistics
-```
-
-## ?? To-Do Future
-
-- [ ] ValidaÁ„o de dados do CSV
-- [ ] Suporte a m˙ltiplos separadores
-- [ ] Interface web para upload de CSV
-- [ ] ExportaÁ„o de dados para CSV
-- [ ] RelatÛrios personalizados
+API RESTful para an√°lise de filmes vencedores do Golden Raspberry Awards utilizando arquitetura Domain-Driven Design (DDD).
 
 ---
 
-**Desenvolvido com .NET 8 + Entity Framework Core + SQLite**
+## üìã Pr√©-requisitos
+
+- [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0)
+- Git
+
+---
+
+## üöÄ Como Rodar o Projeto
+
+### 1. Clonar o reposit√≥rio
+
+```bash
+git clone https://github.com/danillson/ProducerFilm.git
+cd ProducerFilm
+```
+
+### 2. Restaurar as depend√™ncias
+
+```bash
+dotnet restore
+```
+
+### 3. Executar a aplica√ß√£o
+
+```bash
+dotnet run --project ProducerFilm/ProducerFilm. csproj
+```
+
+Ao iniciar, a aplica√ß√£o ir√°:
+- Aplicar as migra√ß√µes do banco de dados SQLite automaticamente
+- Processar arquivos CSV da pasta `fileToRead` e importar os dados
+- Mover os arquivos processados para `fileProcessed`
+- Iniciar o servidor web
+
+### 4. Acessar a aplica√ß√£o
+
+- **URL padr√£o**: `http://localhost:5231`
+- **URL alternativa**: `https://localhost:7231/index.html`
+
+---
+
+## üìñ Acessar o Swagger
+
+O Swagger UI est√° dispon√≠vel no ambiente de desenvolvimento para documenta√ß√£o e testes interativos da API.
+
+### Acessar
+
+1. Execute a aplica√ß√£o conforme descrito acima
+2. Abra o navegador e acesse: 
+
+```
+http://localhost:5231/
+https://localhost:7231/index.html
+```
+
+O Swagger UI ser√° carregado automaticamente na raiz da aplica√ß√£o. 
+
+### Endpoints dispon√≠veis no Swagger
+
+| M√©todo | Endpoint | Descri√ß√£o |
+|--------|----------|-----------|
+| GET | `/api/movielisthistory` | Lista todos os filmes |
+| GET | `/api/movielisthistory/winners` | Apenas vencedores |
+| GET | `/api/movies/winner-interval` | Intervalo de vit√≥rias dos produtores |
+
+---
+
+## üß™ Executar os Testes de Integra√ß√£o
+
+O projeto possui testes de integra√ß√£o utilizando xUnit, FluentAssertions e banco de dados em mem√≥ria. 
+
+### Executar todos os testes
+
+```bash
+dotnet test ProducerFilm. IntegrationTests
+```
+
+### Executar com detalhes
+
+```bash
+dotnet test ProducerFilm.IntegrationTests --verbosity detailed
+```
+
+### Executar um teste espec√≠fico
+
+```bash
+dotnet test ProducerFilm.IntegrationTests --filter "NomeDoTeste"
+```
+
+**Exemplo:**
+
+```bash
+dotnet test ProducerFilm.IntegrationTests --filter "GetWinnerInterval_ShouldCalculateCorrectIntervals_WithSimpleData"
+```
+
+### Executar com cobertura de c√≥digo
+
+```bash
+dotnet test ProducerFilm.IntegrationTests --collect:"XPlat Code Coverage"
+```
+
+### Cen√°rios de Teste Cobertos
+
+- Banco de dados vazio
+- Apenas um vencedor
+- C√°lculo correto de intervalos m√≠nimo e m√°ximo
+- M√∫ltiplos produtores com mesmo intervalo
+- Produtor com 3+ vit√≥rias
+- Ignorar n√£o-vencedores
+- M√∫ltiplos produtores no mesmo filme
+- Formato correto da resposta JSON
+- Cen√°rio real do Golden Raspberry Awards
+
+---
+
+## üõ† Tecnologias Utilizadas
+
+- **. NET 8** - Framework principal
+- **Entity Framework Core 8** - ORM
+- **SQLite** - Banco de dados
+- **Swashbuckle. AspNetCore** - Documenta√ß√£o Swagger
+- **CsvHelper** - Leitura de arquivos CSV
+- **xUnit** - Framework de testes
+- **FluentAssertions** - Assertions leg√≠veis
+- **Microsoft.AspNetCore.Mvc. Testing** - Testes de integra√ß√£o
+
+---
+
+## üìÅ Estrutura do Projeto
+
+```
+ProducerFilm/
+‚îú‚îÄ‚îÄ Application/           # Camada de aplica√ß√£o (servi√ßos, DTOs)
+‚îú‚îÄ‚îÄ Domain/                # Camada de dom√≠nio (entidades, interfaces)
+‚îú‚îÄ‚îÄ Infrastructure/        # Camada de infraestrutura (reposit√≥rios, DbContext)
+‚îú‚îÄ‚îÄ Presentation/          # Camada de apresenta√ß√£o (controllers)
+‚îú‚îÄ‚îÄ Migrations/            # Migra√ß√µes do Entity Framework
+‚îú‚îÄ‚îÄ fileToRead/            # Pasta para arquivos CSV a serem processados
+‚îú‚îÄ‚îÄ fileProcessed/         # Pasta para arquivos CSV j√° processados
+‚îú‚îÄ‚îÄ Program.cs             # Ponto de entrada da aplica√ß√£o
+‚îî‚îÄ‚îÄ appsettings.json       # Configura√ß√µes da aplica√ß√£o
+
+ProducerFilm. IntegrationTests/
+‚îú‚îÄ‚îÄ Common/                # Classes base para testes
+‚îú‚îÄ‚îÄ Endpoints/             # Testes dos endpoints
+‚îî‚îÄ‚îÄ Factories/             # Factory para WebApplicationFactory
+```
+
+---
+
+## üìù Licen√ßa
+
+Este projeto est√° sob a licen√ßa MIT. 
