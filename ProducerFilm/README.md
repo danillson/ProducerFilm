@@ -42,6 +42,7 @@ Ao iniciar, a aplicação irá:
 
 - **URL padrão**: `http://localhost:5231`
 - **URL alternativa**: `https://localhost:7231/index.html`
+- **URL dinâmica**: conforme o ambiente de execução, a url pode ter variação quanto o número da porta de execução no servidor de aplicação local
 
 ---
 
